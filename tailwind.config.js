@@ -35,15 +35,13 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        heading: ['Poppins', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
-        body: ['Poppins', 'sans-serif'],
+        heading: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+        poppins: ['Plus Jakarta Sans', 'sans-serif'],
+        body: ['Plus Jakarta Sans', 'sans-serif'],
       },
       boxShadow: {
-        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.03)',
-        'float': '0 10px 30px -10px rgba(0, 0, 0, 0.06)',
-        'glow-subtle': '0 0 20px -5px rgba(37, 99, 235, 0.15)',
+        // Zero shadow enforcement
       },
       borderRadius: {
         'xl': '12px',

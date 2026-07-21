@@ -65,6 +65,79 @@ export const AppProvider = ({ children }) => {
     { id: 'pricing', name: 'Shop Owner Membership Plan', visible: true }
   ]);
 
+  // Location Selector
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    const saved = localStorage.getItem('app-location');
+    return saved || "Indore, MP";
+  });
+
+  // Inquiry Cart State (Default pre-populated with 3 items matching Screen 6)
+  const [inquiryCart, setInquiryCart] = useState(() => {
+    const saved = localStorage.getItem('app-inquiry-cart');
+    if (saved) return JSON.parse(saved);
+    return [
+      { productId: "prod-iphone15-promax", quantity: 1, color: "Natural Titanium", shopName: "Cellular World Indore" },
+      { productId: "prod-samsung-s24-ultra", quantity: 1, color: "Titanium Black", shopName: "Cellular World Indore" },
+      { productId: "prod-oneplus-12", quantity: 1, color: "Silky Black", shopName: "Tech Corner" }
+    ];
+  });
+  const [isInquiryCartOpen, setIsInquiryCartOpen] = useState(false);
+
+  // Auth Modal State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login'); // 'login' | 'signup'
+
+  // Sync location & cart with LocalStorage
+  useEffect(() => {
+    localStorage.setItem('app-location', selectedLocation);
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    localStorage.setItem('app-inquiry-cart', JSON.stringify(inquiryCart));
+  }, [inquiryCart]);
+
+  // Inquiry Cart Handlers
+  const addToInquiryCart = (product, color = "Standard", qty = 1) => {
+    setInquiryCart(prev => {
+      const existingIndex = prev.findIndex(item => item.productId === product.id && item.color === color);
+      if (existingIndex > -1) {
+        const updated = [...prev];
+        updated[existingIndex].quantity += qty;
+        return updated;
+      }
+      return [...prev, {
+        productId: product.id,
+        quantity: qty,
+        color: color || product.colorVariant || "Standard",
+        shopName: product.shopName || "Local Shop"
+      }];
+    });
+    setIsInquiryCartOpen(true);
+  };
+
+  const removeFromInquiryCart = (productId, color) => {
+    setInquiryCart(prev => prev.filter(item => !(item.productId === productId && (color ? item.color === color : true))));
+  };
+
+  const updateCartQuantity = (productId, color, delta) => {
+    setInquiryCart(prev => prev.map(item => {
+      if (item.productId === productId && item.color === color) {
+        const newQty = item.quantity + delta;
+        return newQty > 0 ? { ...item, quantity: newQty } : item;
+      }
+      return item;
+    }));
+  };
+
+  const clearInquiryCart = () => {
+    setInquiryCart([]);
+  };
+
+  const openAuthModal = (mode = 'login') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
   // Sync with LocalStorage
   useEffect(() => {
     localStorage.setItem('app-shops', JSON.stringify(shops));
@@ -199,6 +272,20 @@ export const AppProvider = ({ children }) => {
       recentSearches,
       homepageSections,
       setHomepageSections,
+      selectedLocation,
+      setSelectedLocation,
+      inquiryCart,
+      addToInquiryCart,
+      removeFromInquiryCart,
+      updateCartQuantity,
+      clearInquiryCart,
+      isInquiryCartOpen,
+      setIsInquiryCartOpen,
+      isAuthModalOpen,
+      setIsAuthModalOpen,
+      authModalMode,
+      setAuthModalMode,
+      openAuthModal,
       logLeadAction,
       upgradeToPremiumWhatsapp,
       addProduct,

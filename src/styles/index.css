@@ -4,14 +4,32 @@
 
 @layer base {
   * {
-    font-family: 'Poppins', sans-serif !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent;
   }
-  html, body {
-    font-family: 'Poppins', sans-serif !important;
-    @apply bg-white dark:bg-[#090D16] text-[#0F172A] dark:text-[#F8FAFC] antialiased selection:bg-slate-900 selection:text-white;
+  html {
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
   }
-  h1, h2, h3, h4, h5, h6, input, button, select, textarea, span, p, a, div {
-    font-family: 'Poppins', sans-serif !important;
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    box-shadow: none !important;
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    @apply bg-white dark:bg-[#090D16] text-[#0F172A] dark:text-[#F8FAFC] antialiased selection:bg-blue-600 selection:text-white;
+  }
+  
+  /* Modern High-Definition Headings using Outfit */
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
+    letter-spacing: -0.025em;
+  }
+
+  input, button, select, textarea, span, p, a, div {
+    box-shadow: none !important;
   }
 }
 
@@ -21,6 +39,7 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(229, 231, 235, 0.8);
+    box-shadow: none !important;
   }
   
   .dark .glass-panel {
@@ -28,6 +47,7 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(30, 41, 59, 0.8);
+    box-shadow: none !important;
   }
 
   .smooth-transition {
@@ -41,6 +61,22 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+  }
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom, 12px);
+  }
+}
+
+/* Global reset for all box shadows */
+*, ::before, ::after {
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-shadow-colored: 0 0 #0000 !important;
+  box-shadow: none !important;
 }
 
 /* Custom sleek scrollbar */

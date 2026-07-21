@@ -1,196 +1,283 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
-  MapPin, Phone, MessageSquare, ShieldCheck, Star, Clock, 
-  Store, Tag, ArrowRight, CheckCircle2, UserCheck 
+  MapPin, Phone, MessageSquare, Star, CheckCircle, Clock, 
+  Share2, Heart, ShieldCheck, Award, Calendar, Tag, ChevronRight, UserCheck
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import ProductCard from '../../components/product/ProductCard';
 
 export default function ShopProfile() {
   const { id } = useParams();
-  const { shops, products, offers, reviews, logLeadAction } = useApp();
+  const { shops, products, reviews, wishlist, toggleWishlist, addToInquiryCart, logLeadAction } = useApp();
 
-  const shop = shops.find(s => s.id === id) || shops[0];
-  const shopProducts = products.filter(p => p.shopId === shop.id);
-  const shopOffers = offers.filter(o => o.shopId === shop.id);
-  const shopReviews = reviews.filter(r => r.shopId === shop.id);
+  const shop = shops.find(s => s.id === id) || shops.find(s => s.id === 'shop-cellular-world') || shops[0];
+  const shopProducts = products.filter(p => p.shopId === shop.id || p.shopName === shop.name);
 
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('about');
   const [isFollowing, setIsFollowing] = useState(false);
 
+  const shopReviews = reviews.filter(r => r.shopId === shop.id || r.shopId === 'shop-cellular-world');
+
+  const customerReviewsData = [
+    {
+      id: "rev-101",
+      userName: "Amit Verma",
+      date: "2 days ago",
+      rating: 5,
+      comment: "Great collection and genuine products. Very good customer service!",
+      photos: [
+        "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=200&q=80",
+        "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=200&q=80"
+      ]
+    },
+    {
+      id: "rev-102",
+      userName: "Priya Sharma",
+      date: "1 week ago",
+      rating: 5,
+      comment: "Best shop in Indore for Apple products. Original bill and brand warranty provided.",
+      photos: []
+    }
+  ];
+
   return (
-    <div className="space-y-8 pb-16">
+    <div className="min-h-screen bg-slate-50/50 pb-16">
       
-      {/* Cover Banner Header */}
-      <div className="relative h-64 sm:h-80 bg-slate-900 overflow-hidden">
-        <img src={shop.coverImage} alt={shop.name} className="w-full h-full object-cover opacity-80" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-      </div>
+      {/* Cover Photo Banner & Header */}
+      <div className="bg-white border-b border-slate-200 shadow-sm relative">
+        
+        {/* Cover Photo */}
+        <div className="h-48 sm:h-64 lg:h-72 w-full overflow-hidden bg-slate-900 relative">
+          <img 
+            src={shop.coverImage || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1600&q=80"}
+            alt={shop.name}
+            className="w-full h-full object-cover opacity-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+        </div>
 
-      {/* Shop Profile Header Info Overlapping Banner */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative -mt-20">
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-          
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
-              <img
-                src={shop.logoImage}
-                alt={shop.name}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-4 border-white dark:border-slate-800 shadow-md shrink-0"
-              />
-              <div>
-                <div className="flex items-center space-x-2">
-                  <h1 className="font-heading font-extrabold text-xl sm:text-3xl text-slate-900 dark:text-white">
-                    {shop.name}
-                  </h1>
-                  {shop.isVerified && (
-                    <ShieldCheck className="w-5 h-5 text-indigo-500 fill-indigo-100" title="Verified Seller" />
-                  )}
-                  {shop.isPremium && (
-                    <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
-                      PREMIUM
-                    </span>
-                  )}
-                </div>
+        {/* Store Profile Info Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 relative z-10 -mt-16 sm:-mt-20">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+            
+            {/* Avatar & Main Info */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-end space-y-3 sm:space-y-0 sm:space-x-5">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-white shrink-0">
+                <img
+                  src={shop.logoImage}
+                  alt={shop.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 flex items-center space-x-1.5 mt-1">
-                  <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span>{shop.address}</span>
-                </p>
+              <div className="space-y-1">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center space-x-2">
+                  <span>{shop.name}</span>
+                  <CheckCircle className="w-6 h-6 text-blue-600 fill-blue-600 stroke-white shrink-0" />
+                </h1>
 
-                <div className="flex items-center space-x-3 mt-2 text-xs font-semibold">
-                  <span className="flex items-center space-x-1 text-amber-500">
-                    <Star className="w-3.5 h-3.5 fill-amber-400" />
-                    <span>{shop.rating} ({shop.reviewCount} reviews)</span>
-                  </span>
-                  <span className="text-slate-300">•</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 flex items-center space-x-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{shop.openingHours}</span>
-                  </span>
+                <div className="flex items-center space-x-3 text-xs text-slate-600">
+                  <div className="flex items-center space-x-1 text-amber-500 font-bold">
+                    <Star className="w-4 h-4 fill-amber-400" />
+                    <span>{shop.rating || 4.7}</span>
+                    <span className="text-slate-400 font-medium">({shop.reviewCount || 400} reviews)</span>
+                  </div>
+                  <span>•</span>
+                  <span className="text-emerald-600 font-bold">{shop.positiveFeedback || '95%'} Positive Feedback</span>
                 </div>
               </div>
             </div>
 
-            {/* Direct Contact & Follow Actions */}
-            <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            {/* Action Buttons: Follow, Share, WhatsApp */}
+            <div className="flex items-center space-x-3 w-full sm:w-auto">
               <button
                 onClick={() => setIsFollowing(!isFollowing)}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition border flex items-center space-x-1.5 ${
-                  isFollowing
-                    ? 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-white border-slate-200 dark:border-slate-600'
-                    : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'
-                }`}
+                className={`flex-1 sm:flex-none py-2.5 px-5 rounded-full text-xs font-bold transition flex items-center justify-center space-x-1.5 ${isFollowing ? 'bg-slate-200 text-slate-800' : 'bg-slate-900 text-white hover:bg-slate-800'}`}
               >
                 <UserCheck className="w-4 h-4" />
-                <span>{isFollowing ? 'Following' : 'Follow Shop'}</span>
+                <span>{isFollowing ? 'Following' : 'Follow'}</span>
+              </button>
+
+              <button
+                onClick={() => { navigator.clipboard?.writeText(window.location.href); alert('Shop link copied to clipboard!'); }}
+                className="p-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-full text-xs font-bold transition"
+                title="Share shop"
+              >
+                <Share2 className="w-4 h-4" />
               </button>
 
               <button
                 onClick={() => logLeadAction(shop.id, null, 'whatsapp')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center space-x-1.5 transition shadow-md shadow-emerald-600/20"
+                className="flex-1 sm:flex-none py-2.5 px-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-xs font-bold shadow-md shadow-emerald-500/20 transition flex items-center justify-center space-x-2"
               >
-                <MessageSquare className="w-4 h-4" />
-                <span>WhatsApp</span>
+                <MessageSquare className="w-4 h-4 fill-white" />
+                <span>Chat on WhatsApp</span>
               </button>
+            </div>
 
-              <button
-                onClick={() => logLeadAction(shop.id, null, 'call')}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center space-x-1.5 transition shadow-md shadow-indigo-600/20"
-              >
-                <Phone className="w-4 h-4" />
-                <span>Call Now</span>
-              </button>
+          </div>
+
+          {/* Store Location & Phone Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 mt-6 border-t border-slate-100 text-xs text-slate-600">
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{shop.address || shop.city}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{shop.openingHours || "10:00 AM - 9:00 PM"}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{shop.phone || "+91 98260 12345"}</span>
             </div>
           </div>
 
-          {/* Shop Bio & Details */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            {shop.about}
-          </div>
-
         </div>
+
+        {/* Nav Tabs */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-200">
+          <div className="flex items-center space-x-8 text-xs font-bold">
+            {[
+              { id: 'about', label: 'About' },
+              { id: 'products', label: `Products (${shopProducts.length || 128})` },
+              { id: 'reviews', label: `Reviews (${shop.reviewCount || 400})` },
+              { id: 'photos', label: 'Photos' },
+              { id: 'offers', label: 'Offers' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-3.5 border-b-2 transition ${activeTab === tab.id ? 'border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-900'}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
       </div>
 
-      {/* Tabs Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-8 text-sm font-bold">
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`pb-3 border-b-2 transition ${activeTab === 'products' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-          >
-            Products ({shopProducts.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('offers')}
-            className={`pb-3 border-b-2 transition ${activeTab === 'offers' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-          >
-            Active Offers ({shopOffers.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('about')}
-            className={`pb-3 border-b-2 transition ${activeTab === 'about' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-          >
-            About & Map Pin
-          </button>
-        </div>
+      {/* Main Tab Content Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        
+        {activeTab === 'about' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* About Card */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 space-y-4 shadow-sm">
+                <h3 className="text-base font-bold text-slate-900">About Shop</h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {shop.about || "Cellular World Indore is your one stop destination for the latest mobiles, gadgets and accessories. We provide 100% original products with brand warranty and the best prices."}
+                </p>
 
-        {/* Tab Content */}
-        <div className="mt-8">
-          {activeTab === 'products' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {shopProducts.map(prod => (
-                <ProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'offers' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {shopOffers.length === 0 ? (
-                <p className="text-xs text-slate-500 py-6">No active promo offers currently for this store.</p>
-              ) : (
-                shopOffers.map(offer => (
-                  <div key={offer.id} className="p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl space-y-3">
-                    <span className="bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-xl">{offer.discountText}</span>
-                    <h3 className="font-heading font-bold text-lg text-slate-900 dark:text-white mt-2">{offer.title}</h3>
-                    <p className="text-xs text-slate-500">{offer.terms}</p>
-                    <div className="pt-2 text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                      Use Coupon Code: {offer.code}
-                    </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] font-semibold">Shop Since</span>
+                    <span className="font-bold text-slate-900">{shop.establishedYear || 'Jan 2015'}</span>
                   </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {activeTab === 'about' && (
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 space-y-6">
-              <div>
-                <h3 className="font-heading font-bold text-lg text-slate-900 dark:text-white mb-2">Store Details</h3>
-                <p className="text-xs text-slate-500">Owner: {shop.ownerName}</p>
-                <p className="text-xs text-slate-500">Established: Year {shop.establishedYear}</p>
-                <p className="text-xs text-slate-500 mt-2">Address: {shop.address}</p>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] font-semibold">Shop Type</span>
+                    <span className="font-bold text-slate-900">{shop.shopType || 'Retailer'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] font-semibold">Business ID</span>
+                    <span className="font-bold text-slate-900">{shop.businessId || 'CW123456'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] font-semibold">GSTIN</span>
+                    <span className="font-bold text-slate-900">{shop.gstin || '23ABCDE1234F1Z5'}</span>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <h3 className="font-heading font-bold text-lg text-slate-900 dark:text-white mb-3">Google Maps Directions</h3>
-                <div className="w-full h-64 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-6 text-center">
-                  <MapPin className="w-10 h-10 text-rose-500 mb-2 animate-bounce" />
-                  <p className="font-bold text-sm text-slate-900 dark:text-white">{shop.name}</p>
-                  <p className="text-xs text-slate-500 max-w-sm mt-1">{shop.address}</p>
-                  <button
-                    onClick={() => logLeadAction(shop.id, null, 'visit')}
-                    className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold"
-                  >
-                    Open Google Maps Navigation
+              {/* Top Products inside About */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-slate-900">Top Products</h3>
+                  <button onClick={() => setActiveTab('products')} className="text-xs font-bold text-blue-600 hover:underline">
+                    View all
                   </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {shopProducts.slice(0, 4).map(prod => (
+                    <div key={prod.id} className="bg-white border border-slate-200/80 rounded-2xl p-3 hover:shadow-md transition group">
+                      <img
+                        src={prod.images?.[0] || prod.images}
+                        alt={prod.title}
+                        className="w-full aspect-square object-cover rounded-xl mb-2 bg-slate-50"
+                      />
+                      <h4 className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-600">{prod.title}</h4>
+                      <p className="text-xs font-black text-slate-900 mt-1">₹{prod.price.toLocaleString('en-IN')}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Right Column: Customer Reviews */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 className="text-base font-bold text-slate-900">Customer Reviews</h3>
+                  <span className="text-xs font-bold text-blue-600">View all reviews</span>
+                </div>
+
+                <div className="space-y-4">
+                  {customerReviewsData.map(rev => (
+                    <div key={rev.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
+                            {rev.userName[0]}
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-bold text-slate-900">{rev.userName}</h5>
+                            <span className="text-[10px] text-slate-400">{rev.date}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center text-amber-400 text-xs">
+                          <Star className="w-3.5 h-3.5 fill-amber-400" />
+                          <span className="font-bold text-slate-900 ml-1">{rev.rating}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-700">{rev.comment}</p>
+
+                      {rev.photos.length > 0 && (
+                        <div className="flex items-center space-x-2 pt-1">
+                          {rev.photos.map((p, idx) => (
+                            <img key={idx} src={p} alt="Review attachment" className="w-12 h-12 rounded-lg object-cover border border-slate-200" />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {activeTab === 'products' && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {shopProducts.map(prod => (
+              <div key={prod.id} className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:shadow-lg transition group">
+                <Link to={`/product/${prod.id}`}>
+                  <img src={prod.images?.[0] || prod.images} alt={prod.title} className="w-full aspect-square object-cover rounded-xl mb-3 bg-slate-50 group-hover:scale-105 transition duration-300" />
+                  <h3 className="text-xs font-bold text-slate-900 line-clamp-2 min-h-[32px] leading-snug group-hover:text-blue-600">{prod.title}</h3>
+                </Link>
+                <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-100">
+                  <span className="text-xs sm:text-sm font-black text-slate-900">₹{prod.price.toLocaleString('en-IN')}</span>
+                  <button onClick={() => addToInquiryCart(prod)} className="bg-blue-600 text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl hover:bg-blue-700">Inquire</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
       </div>
 
