@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, User, Phone, MapPin } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AuthModal() {
   const { isAuthModalOpen, setIsAuthModalOpen, authModalMode, setAuthModalMode } = useApp();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +17,8 @@ export default function AuthModal() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`${authModalMode === 'login' ? 'Logged in successfully!' : 'Account created successfully!'}`);
+    login('customer');
+    alert(`${authModalMode === 'login' ? 'Logged in successfully as ' + (email || 'Customer') + '!' : 'Account created successfully for ' + (fullName || 'Customer') + '!'}`);
     setIsAuthModalOpen(false);
   };
 
